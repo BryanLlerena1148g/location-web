@@ -6,13 +6,21 @@ import {
   Container, 
   Grid, 
   Paper,
-  Box
+  Box,
+  Tabs,
+  Tab
 } from '@mui/material'
+import {
+  Map as MapIcon,
+  AdminPanelSettings as AdminIcon
+} from '@mui/icons-material'
 import LocationMap from './components/LocationMap'
 import LocationSidebar from './components/LocationSidebar'
+import AdminPanel from './components/AdminPanel'
 import { fetchLocations, fetchMachines, fetchStats } from './services/api'
 
 function App() {
+  const [activeTab, setActiveTab] = useState(0)
   const [locations, setLocations] = useState([])
   const [machines, setMachines] = useState([])
   const [selectedMachine, setSelectedMachine] = useState('')
@@ -102,50 +110,91 @@ function App() {
     loadInitialData()
   }
 
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue)
+  }
+
   return (
     <Box sx={{ flexGrow: 1, height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <AppBar position="static" elevation={2}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            🗺️ Location Tracker Viewer
+            🗺️ adobeFirewall Tracker
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            {selectedMachine ? `📱 ${selectedMachine}` : '🌍 Todas las máquinas'} 
-            {locations.length > 0 && ` • ${locations.length} ubicaciones`}
+            {activeTab === 0 && (
+              selectedMachine ? `📱 ${selectedMachine}` : '🌍 Todas las máquinas'
+            )}
+            {activeTab === 0 && locations.length > 0 && ` • ${locations.length} ubicaciones`}
+            {activeTab === 1 && '⚠️ Modo Administración'}
           </Typography>
         </Toolbar>
+        <Tabs 
+          value={activeTab} 
+          onChange={handleTabChange}
+          sx={{ 
+            bgcolor: 'rgba(255,255,255,0.1)',
+            '& .MuiTab-root': { 
+              color: 'rgba(255,255,255,0.7)',
+              minHeight: 48
+            },
+            '& .Mui-selected': { 
+              color: 'white !important' 
+            },
+            '& .MuiTabs-indicator': {
+              backgroundColor: 'white'
+            }
+          }}
+        >
+          <Tab 
+            icon={<MapIcon />} 
+            label="Mapa de Ubicaciones" 
+            iconPosition="start"
+            sx={{ textTransform: 'none' }}
+          />
+          <Tab 
+            icon={<AdminIcon />} 
+            label="Panel de Administración" 
+            iconPosition="start"
+            sx={{ textTransform: 'none' }}
+          />
+        </Tabs>
       </AppBar>
 
-      <Box sx={{ flexGrow: 1, display: 'flex', height: 'calc(100vh - 64px)' }}>
-        <Grid container sx={{ height: '100%' }}>
-          {/* Sidebar */}
-          <Grid item xs={12} md={4} lg={3}>
-            <LocationSidebar
-              machines={machines}
-              locations={locations}
-              selectedMachine={selectedMachine}
-              selectedLocation={selectedLocation}
-              stats={stats}
-              loading={loading}
-              error={error}
-              filters={filters}
-              onMachineSelect={handleMachineSelect}
-              onLocationSelect={handleLocationSelect}
-              onFilterChange={handleFilterChange}
-              onRefresh={handleRefresh}
-            />
-          </Grid>
+      <Box sx={{ flexGrow: 1, height: 'calc(100vh - 112px)' }}>
+        {activeTab === 0 && (
+          <Grid container sx={{ height: '100%' }}>
+            {/* Sidebar */}
+            <Grid item xs={12} md={4} lg={3}>
+              <LocationSidebar
+                machines={machines}
+                locations={locations}
+                selectedMachine={selectedMachine}
+                selectedLocation={selectedLocation}
+                stats={stats}
+                loading={loading}
+                error={error}
+                filters={filters}
+                onMachineSelect={handleMachineSelect}
+                onLocationSelect={handleLocationSelect}
+                onFilterChange={handleFilterChange}
+                onRefresh={handleRefresh}
+              />
+            </Grid>
 
-          {/* Map */}
-          <Grid item xs={12} md={8} lg={9}>
-            <LocationMap
-              locations={locations}
-              selectedLocation={selectedLocation}
-              loading={loading}
-              onLocationSelect={handleLocationSelect}
-            />
+            {/* Map */}
+            <Grid item xs={12} md={8} lg={9}>
+              <LocationMap
+                locations={locations}
+                selectedLocation={selectedLocation}
+                loading={loading}
+                onLocationSelect={handleLocationSelect}
+              />
+            </Grid>
           </Grid>
-        </Grid>
+        )}
+
+        {activeTab === 1 && <AdminPanel />}
       </Box>
     </Box>
   )

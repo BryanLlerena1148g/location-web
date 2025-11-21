@@ -116,6 +116,35 @@ export const sendLocation = async (locationData) => {
   }
 }
 
+/**
+ * Limpiar toda la base de datos (ADMIN)
+ */
+export const clearAllData = async () => {
+  try {
+    const response = await api.delete('/admin/clear-database', {
+      data: { confirm: 'DELETE_ALL_DATA' }
+    })
+    return response.data
+  } catch (error) {
+    throw new Error(`Error clearing all data: ${error.response?.data?.message || error.message}`)
+  }
+}
+
+/**
+ * Limpiar datos de una máquina específica (ADMIN)
+ * @param {string} machineName - Nombre de la máquina
+ */
+export const clearMachineData = async (machineName) => {
+  try {
+    const response = await api.delete(`/admin/clear-machine/${encodeURIComponent(machineName)}`, {
+      data: { confirm: 'DELETE_MACHINE_DATA' }
+    })
+    return response.data
+  } catch (error) {
+    throw new Error(`Error clearing machine data: ${error.response?.data?.message || error.message}`)
+  }
+}
+
 // Funciones de utilidad
 
 /**

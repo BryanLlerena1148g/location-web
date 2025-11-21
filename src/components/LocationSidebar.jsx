@@ -161,7 +161,26 @@ const LocationSidebar = ({
           </Alert>
         )}
 
-        <List sx={{ flexGrow: 1, overflow: 'auto', p: 0 }} dense>
+        <List sx={{ 
+          flexGrow: 1, 
+          overflow: 'auto', 
+          p: 0,
+          maxHeight: '200px',
+          '&::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1',
+            borderRadius: '3px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#bbb',
+            borderRadius: '3px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: '#999',
+          }
+        }} dense>
           {machines.map((machine) => (
             <ListItem key={machine.name} disablePadding>
               <ListItemButton
@@ -205,7 +224,26 @@ const LocationSidebar = ({
             <CircularProgress size={30} />
           </Box>
         ) : (
-          <List sx={{ flexGrow: 1, overflow: 'auto', p: 0 }} dense>
+          <List sx={{ 
+            flexGrow: 1, 
+            overflow: 'auto', 
+            p: 0,
+            maxHeight: '400px',
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: '#f1f1f1',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: '#888',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: '#555',
+            }
+          }} dense>
             {locations.map((location, index) => (
               <ListItem key={`${location.id}-${index}`} disablePadding>
                 <ListItemButton
