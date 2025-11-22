@@ -145,6 +145,30 @@ export const clearMachineData = async (machineName) => {
   }
 }
 
+/**
+ * Obtener información detallada de la base de datos
+ */
+export const fetchDatabaseInfo = async () => {
+  try {
+    const response = await api.get('/database/info')
+    return response.data
+  } catch (error) {
+    throw new Error(`Error fetching database info: ${error.response?.data?.message || error.message}`)
+  }
+}
+
+/**
+ * Obtener solo el tamaño de la base de datos (endpoint rápido)
+ */
+export const fetchDatabaseSize = async () => {
+  try {
+    const response = await api.get('/database/size')
+    return response.data
+  } catch (error) {
+    throw new Error(`Error fetching database size: ${error.response?.data?.message || error.message}`)
+  }
+}
+
 // Funciones de utilidad
 
 /**

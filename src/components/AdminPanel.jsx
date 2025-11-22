@@ -25,10 +25,11 @@ import {
   DeleteSweep as DeleteSweepIcon,
   Warning as WarningIcon
 } from '@mui/icons-material'
-import { clearAllData, clearMachineData, fetchMachines } from '../services/api'
+import { clearAllData, clearMachineData, fetchMachines, fetchDatabaseInfo } from '../services/api'
 
 const AdminPanel = () => {
   const [machines, setMachines] = useState([])
+  const [databaseInfo, setDatabaseInfo] = useState(null)
   const [loading, setLoading] = useState(false)
   const [openClearAll, setOpenClearAll] = useState(false)
   const [openClearMachine, setOpenClearMachine] = useState(false)
@@ -46,6 +47,16 @@ const AdminPanel = () => {
       showSnackbar('Error cargando máquinas: ' + error.message, 'error')
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Cargar información de base de datos
+  const loadDatabaseInfo = async () => {
+    try {
+      const data = await fetchDatabaseInfo()
+      setDatabaseInfo(data.database || null)
+    } catch (error) {
+      showSnackbar('Error cargando información de BD: ' + error.message, 'error')
     }
   }
 
@@ -68,6 +79,7 @@ const AdminPanel = () => {
       setOpenClearAll(false)
       setConfirmText('')
       loadMachines() // Recargar lista
+      loadDatabaseInfo() // Recargar info de BD
     } catch (error) {
       showSnackbar('Error eliminando datos: ' + error.message, 'error')
     } finally {
@@ -90,6 +102,7 @@ const AdminPanel = () => {
       setConfirmText('')
       setSelectedMachine('')
       loadMachines() // Recargar lista
+      loadDatabaseInfo() // Recargar info de BD
     } catch (error) {
       showSnackbar('Error eliminando datos: ' + error.message, 'error')
     } finally {
@@ -105,6 +118,7 @@ const AdminPanel = () => {
 
   React.useEffect(() => {
     loadMachines()
+    loadDatabaseInfo()
   }, [])
 
   return (
@@ -119,6 +133,76 @@ const AdminPanel = () => {
       </Alert>
 
       <Grid container spacing={3}>
+        {/* Información de base de datos */}
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                💾 Información de Base de Datos
+              </Typography>
+              {databaseInfo ? (
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography variant="body2" color="text.secondary">
+                      📁 Tamaño del archivo
+                    </Typography>
+                    <Typography variant="h6" color="primary">
+                      {databaseInfo.file?.size_human || 'N/A'}
+                    </Typography>
+                    <Typography variant="caption">
+                      ({databaseInfo.file?.size_mb} MB)
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography variant="body2" color="text.secondary">
+                      📊 Total de registros
+                    </Typography>
+                    <Typography variant="h6" color="primary">
+                      {databaseInfo.statistics?.total_records?.toLocaleString() || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography variant="body2" color="text.secondary">
+                      🗂️ Páginas SQLite
+                    </Typography>
+                    <Typography variant="h6" color="primary">
+                      {databaseInfo.sqlite?.page_count?.toLocaleString() || 0}
+                    </Typography>
+                    <Typography variant="caption">
+                      ({databaseInfo.sqlite?.page_size} bytes/página)
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={3}>
+                    <Typography variant="body2" color="text.secondary">
+                      📅 Última modificación
+                    </Typography>
+                    <Typography variant="body2">
+                      {databaseInfo.file?.last_modified 
+                        ? new Date(databaseInfo.file.last_modified).toLocaleString()
+                        : 'N/A'
+                      }
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={loadDatabaseInfo}
+                      disabled={loading}
+                    >
+                      🔄 Actualizar Información
+                    </Button>
+                  </Grid>
+                </Grid>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  Cargando información de base de datos...
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
         {/* Acciones globales */}
         <Grid item xs={12} md={6}>
           <Card>
